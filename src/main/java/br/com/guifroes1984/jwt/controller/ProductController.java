@@ -27,7 +27,7 @@ public class ProductController {
 
         try {
             Set<ImageModel> images = uploadImage(file);
-            product.setProductImagens(images);
+            product.setProductImages(images);
             return productService.addNewProduct(product);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -53,6 +53,11 @@ public class ProductController {
     @GetMapping({"/getAllProducts"})
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    @GetMapping({"/getProductDetailsById/{productId}"})
+    public Product getProductDetailsById(@PathVariable("productId") Integer productId) {
+         return productService.getProductDetailsById(productId);
     }
 
     @DeleteMapping({"/deleteProductDetails/{productId}"})
