@@ -5,6 +5,7 @@ import br.com.guifroes1984.jwt.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,5 +28,20 @@ public class ProductService {
 
     public void deleteProductDetails(Integer productId) {
         productDao.deleteById(productId);
+    }
+
+    public List<Product> getProductDetails(boolean isSingleProductCheckout, Integer productId) {
+        if (isSingleProductCheckout) {
+            // vamos comprar um único produto
+
+            List<Product> list = new ArrayList<>();
+            Product product = productDao.findById(productId).get();
+            list.add(product);
+            return list;
+        } else {
+            // vamos verificar o carrinho inteiro
+        }
+
+        return new ArrayList<>();
     }
 }
