@@ -1,7 +1,12 @@
 package br.com.guifroes1984.jwt.service;
 
+import br.com.guifroes1984.jwt.configuration.JwtRequestFilter;
+import br.com.guifroes1984.jwt.dao.CartDao;
 import br.com.guifroes1984.jwt.dao.ProductDao;
+import br.com.guifroes1984.jwt.dao.UserDao;
+import br.com.guifroes1984.jwt.entity.Cart;
 import br.com.guifroes1984.jwt.entity.Product;
+import br.com.guifroes1984.jwt.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,12 +14,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
 
     @Autowired
     private ProductDao productDao;
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private CartDao cartDao;
 
     public Product addNewProduct(Product product) {
         return productDao.save(product);
@@ -42,7 +54,7 @@ public class ProductService {
     }
 
     public List<Product> getProductDetails(boolean isSingleProductCheckout, Integer productId) {
-        if (isSingleProductCheckout) {
+        if (isSingleProductCheckout && productId != 0) {
             // vamos comprar um único produto
 
             List<Product> list = new ArrayList<>();
@@ -51,8 +63,11 @@ public class ProductService {
             return list;
         } else {
             // vamos verificar o carrinho inteiro
-        }
+            String username = JwtRequestFilter.CURRENT_USER;
+            User user = userDao.findById(username).get();
+            List<Cart> carts = cartDao.findByUser(user);
 
-        return new ArrayList<>();
+            return carts.stream().map(x -> x.getProduct()).collect(Collectors.toList());
+        }
     }
 }
