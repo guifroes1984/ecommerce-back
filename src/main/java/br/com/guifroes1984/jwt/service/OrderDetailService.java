@@ -1,6 +1,7 @@
 package br.com.guifroes1984.jwt.service;
 
 import br.com.guifroes1984.jwt.configuration.JwtRequestFilter;
+import br.com.guifroes1984.jwt.dao.CartDao;
 import br.com.guifroes1984.jwt.dao.OrderDetailDao;
 import br.com.guifroes1984.jwt.dao.ProductDao;
 import br.com.guifroes1984.jwt.dao.UserDao;
@@ -24,7 +25,10 @@ public class OrderDetailService {
     @Autowired
     private UserDao userDao;
 
-    public void placeOrder(OrderInput orderInput) {
+    @Autowired
+    private CartDao cartDao;
+
+    public void placeOrder(OrderInput orderInput, boolean isSingleProductCheckout) {
         List<OrderProductQuantity> productQuantityList = orderInput.getOrderProductQuantityList();
 
         for (OrderProductQuantity o: productQuantityList) {
@@ -43,6 +47,11 @@ public class OrderDetailService {
                         product,
                         user
             );
+            // esvaziar o carrinho
+            if(!isSingleProductCheckout) {
+                List<Cart> carts = cartDao.findByUser(user);
+                carts.stream().forEach(x -> cartDao.deleteById(x.getCartId()));
+            }
 
             orderDetailDao.save(orderDetail);
         }
